@@ -58,7 +58,7 @@ class ActionMineZenWoodStackTool : ActionContinuousBase
 			// No valid wood stack object found
 			if (GetZenFirewoodConfig().DebugOn)
 			{
-				ZenWood_SendMsg(action_data.m_Player, "ERROR: No valid wood object found - in debug mode getting firewood won't work!");
+				action_data.m_Player.ZenWood_SendMsg("ERROR: No valid wood object found - in debug mode getting firewood won't work!");
 			}
 
 			return;
@@ -66,7 +66,7 @@ class ActionMineZenWoodStackTool : ActionContinuousBase
 
 		if (woodLeft <= 0)
 		{
-			ZenWood_SendMsg(action_data.m_Player, GetZenFirewoodConfig().NoWoodLeftMessage);
+			action_data.m_Player.ZenWood_SendMsg(GetZenFirewoodConfig().NoWoodLeftMessage);
 			return;
 		}
 
@@ -79,15 +79,5 @@ class ActionMineZenWoodStackTool : ActionContinuousBase
 			woodItem.SetHealth(Math.RandomIntInclusive(0, 500));
 			woodReserve.ConsumeWood();
 		}
-	}
-
-	void ZenWood_SendMsg(PlayerBase player, string message)
-	{
-		Param1<string> Msgparam;
-		PlayerIdentity playerIdentity = player.GetIdentity();
-		Msgparam = new Param1<string>(message);
-
-		if (player != null && player.IsAlive())
-			GetGame().RPCSingleParam(player, ERPCs.RPC_USER_ACTION_MESSAGE, Msgparam, true, playerIdentity);
 	}
 };

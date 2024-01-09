@@ -22,49 +22,46 @@ class ZenFirewoodConfig
 	// Load config file or create default file if config doesn't exsit
 	void Load()
 	{
-		if (GetGame().IsServer())
-		{
-			if (FileExist(zenModFolder + zenConfigName))
-			{	// If config exists, load file
-				JsonFileLoader<ZenFirewoodConfig>.JsonLoadFile(zenModFolder + zenConfigName, this);
+		if (FileExist(zenModFolder + zenConfigName))
+		{	// If config exists, load file
+			JsonFileLoader<ZenFirewoodConfig>.JsonLoadFile(zenModFolder + zenConfigName, this);
 
-				// If version mismatch, backup old version of json before replacing it
-				if (ConfigVersion != CONFIG_VERSION)
-				{
-					JsonFileLoader<ZenFirewoodConfig>.JsonSaveFile(zenModFolder + zenConfigName + "_old", this);
-					ConfigVersion = CONFIG_VERSION;
-				}
-				else
-				{
-					// Config exists and version matches, stop here.
-					return;
-				}
+			// If version mismatch, backup old version of json before replacing it
+			if (ConfigVersion != CONFIG_VERSION)
+			{
+				JsonFileLoader<ZenFirewoodConfig>.JsonSaveFile(zenModFolder + zenConfigName + "_old", this);
+				ConfigVersion = CONFIG_VERSION;
 			}
-
-			// Prepare new config parameters
-			ZenFirewoodLogger.Log("Generating new config...");
-			vector cpLocation;
-			vector cpOrientation;
-			WoodTypes.Clear();
-			WoodPositions.Clear();
-			NoWoodLeftMessage = "It seems the wood left in this pile is wet and rotten, I can't use this...";
-
-			// Insert wood types
-			WoodTypes.Insert(new ZenFirewoodType("_woodreserve", "0 0 0.2", "0 0 0")); // Wood reserves with a roof found in towns etc
-			WoodTypes.Insert(new ZenFirewoodType("_woodpile_forest", "0 0.3 0", "90 0 90")); // Piles of firewood near hunting cabins etc
-			WoodTypes.Insert(new ZenFirewoodType("_woodpile1", "0 -0.5 0", "0 0 0")); // Small stack of firewood near camps etc
-			WoodTypes.Insert(new ZenFirewoodType("_woodpile2", "0 -0.5 0", "0 0 0")); // Small stack of firewood near camps etc
-
-			// Generate new default config
-			ConfigVersion			= CONFIG_VERSION;	// Set current config version
-			LogsOn					= true;				// Turn text logs on by default
-			DebugOn					= false;			// Set to true to turn debug objects on (visible firewood objects)
-			DumpObjectLocations		= true;				// Since this is first start, dump object locations to json
-			SpawnFirewoodObjects	= true;				// Spawn the firewood objects after dumping them
-
-			// Save new config
-			Save();
+			else
+			{
+				// Config exists and version matches, stop here.
+				return;
+			}
 		}
+
+		// Prepare new config parameters
+		ZenFirewoodLogger.Log("Generating new config...");
+		vector cpLocation;
+		vector cpOrientation;
+		WoodTypes.Clear();
+		WoodPositions.Clear();
+		NoWoodLeftMessage = "It seems the wood left in this pile is wet and rotten, I can't use this...";
+
+		// Insert wood types
+		WoodTypes.Insert(new ZenFirewoodType("_woodreserve", "0 0 0", "0 0 0")); // Wood reserves with a roof found in towns etc
+		WoodTypes.Insert(new ZenFirewoodType("_woodpile_forest", "0 0.3 0", "90 0 90")); // Piles of firewood near hunting cabins etc
+		WoodTypes.Insert(new ZenFirewoodType("_woodpile1", "0 -0.5 0", "0 0 0")); // Small stack of firewood near camps etc
+		WoodTypes.Insert(new ZenFirewoodType("_woodpile2", "0 -0.5 0", "0 0 0")); // Small stack of firewood near camps etc
+
+		// Generate new default config
+		ConfigVersion			= CONFIG_VERSION;	// Set current config version
+		LogsOn					= true;				// Turn text logs on by default
+		DebugOn					= false;			// Set to true to turn debug objects on (visible firewood objects)
+		DumpObjectLocations		= true;				// Since this is first start, dump object locations to json
+		SpawnFirewoodObjects	= true;				// Spawn the firewood objects after dumping them
+
+		// Save new config
+		Save();
 	}
 
 	// Save config
@@ -169,6 +166,14 @@ class ZenFirewoodConfig
 
 		return Vector(0, 0, 0);
 	}
+
+	// Deletes this config from memory as it's no longer needed
+	void Delete()
+	{
+		WoodTypes.Clear();
+		delete WoodTypes;
+		delete m_ZenFirewoodConfig;
+	}
 }
 
 // Define a firewood type
@@ -208,7 +213,9 @@ static ZenFirewoodConfig GetZenFirewoodConfig()
 	{
 		Print("[ZenFirewoodConfig] Init");
 		m_ZenFirewoodConfig = new ZenFirewoodConfig;
-		m_ZenFirewoodConfig.Load();
+
+		if (GetGame().IsDedicatedServer())
+			m_ZenFirewoodConfig.Load();
 	}
 
 	return m_ZenFirewoodConfig;

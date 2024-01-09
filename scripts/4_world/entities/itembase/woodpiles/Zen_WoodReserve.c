@@ -4,7 +4,7 @@ class Zen_WoodReserve extends BuildingSuper
 
 	void Zen_WoodReserve()
 	{
-		if (GetGame().IsServer())
+		if (GetGame().IsDedicatedServer())
 		{
 			int minWood = GetZenFirewoodConfig().GetMinWood(this.GetType());
 			int maxWood = GetZenFirewoodConfig().GetMaxWood(this.GetType());

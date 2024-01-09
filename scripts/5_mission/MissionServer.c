@@ -5,20 +5,16 @@ modded class MissionServer
 	{
 		super.OnInit();
 
-		// Dump objects / spawn firewood piles
-		if (GetGame().IsMultiplayer() && !GetGame().IsClient() && GetGame().IsServer())
+		// Dump object locations
+		if (GetZenFirewoodConfig().DumpObjectLocations)
 		{
-			// Dump object locations
-			if (GetZenFirewoodConfig().DumpObjectLocations)
-			{
-				// Wait 20 secs to ensure all vanilla + modded items are loaded in
-				GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(DumpObjects, 20000, false);
-			}
-			else
-			if (GetZenFirewoodConfig().SpawnFirewoodObjects || GetZenFirewoodConfig().DebugOn)
-			{
-				GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(SetupWoodPiles, 20000, false);
-			}
+			// Wait 20 secs to ensure all vanilla + modded items are loaded in
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(DumpObjects, 20000, false);
+		}
+		else
+		if (GetZenFirewoodConfig().SpawnFirewoodObjects || GetZenFirewoodConfig().DebugOn)
+		{
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(SetupWoodPiles, 20000, false);
 		}
 	}
 
@@ -26,6 +22,7 @@ modded class MissionServer
 	void SetupWoodPiles()
 	{
 		ZenFirewoodLogger.Log("Setting up wood piles...");
+
 		string woodModel = "Zen_WoodReserve";
 		int minWood;
 		int maxWood;
@@ -88,7 +85,8 @@ modded class MissionServer
 			}
 		}
 
-		ZenFirewoodLogger.Log("Done.");
+		GetZenFirewoodConfig().Delete();
+		ZenFirewoodLogger.Log("Done - deleted ref to config.");
 	}
 
 	// Creates an interactive object on the static wood piles

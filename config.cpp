@@ -10,7 +10,8 @@ class CfgPatches
 		};
 		units[] =
 		{
-			"Zen_FireWood1",
+			"Zen_WoodReserve",
+			"Zen_WoodReserve_Debug"
 		};
 	};
 };
